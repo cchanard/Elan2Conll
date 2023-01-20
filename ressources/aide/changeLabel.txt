@@ -1,0 +1,9 @@
+To replace the contents of the tiers 'ref' (Label&Number) by the name of the file followed by a number.
+
+If there are many speakers, there will be a cross-numbering between the ref tiers depending on the speak turns
+
+- Select the file to be processed : File, Open File
+- Correction : Change Label
+- Save the corrected file : File, Save As
+
+The new file will be created in a sub-folder 'new'

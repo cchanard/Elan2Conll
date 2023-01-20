@@ -1,0 +1,13 @@
+Cette commande recherche les TimeCode des tier alignable 
+et verifie si les frontieres correspondent entre elles
+Si une frontiere d'une tier est a une distance differente 
+de epsilon de la frontiere d'une autre tier, 
+la commande fait en sorte qu'elles soient identiques
+
+- Selectionnez le fichier a traiter par File, Open
+- Faites Commande, Align
+- Saisissez le nom de la tier 'mot' de reference pour l'alignement
+- Saisissez les tiers independantes a aligner avec les frontieres des mots
+   Plusieurs tiers peuvent être mentionnees, separees par des virgules
+- Cliquez sur le bouton 'Go'
+- Enregistrez le fichier corrige par File, Save As

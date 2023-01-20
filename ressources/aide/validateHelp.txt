@@ -1,0 +1,10 @@
+Allows you to check if a file conforms to a template
+
+The command can be launched on a folder
+
+- Select the ELAN template (.etf) for the test : File, Open Template
+- Select the file to be processed by File : Open File (or ELAN Directory)
+- Command : Validate
+
+The result of the validation appears on the console
+

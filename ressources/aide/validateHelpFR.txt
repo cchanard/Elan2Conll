@@ -1,0 +1,8 @@
+Permet de vérifier si un fichier est conforme à un modèle (template)
+
+La commande peut etre lancée sur un dossier
+
+- Selectionnez le fichier de reference (.etf) pour le test : File, Open Template
+- Selectionnez le fichier a traiter : File, Open File (ou open ELAN directory)
+- Commande :  Validate
+Le résultat de la validation apparaît sur la console

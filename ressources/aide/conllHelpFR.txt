@@ -1,0 +1,14 @@
+Convertit un fichier Elan file au format 'conll'
+
+La segmentation des phrases est basée sur les ponctuations choisies dans une tier sélectionné (peut être ft, Mft ou autre où les ponctuations se terminent)
+S’il y a beaucoup de locuteurs, les tours de parole seront correctement traités si la numérotation dans les tiers ref alterne suivant les tours de parole.
+Vous pouvez effectuer cette numérotation alternée avec la commande Change Label (voir Aide étiquette)
+
+- Sélectionner le fichier ELAN (ou un répertoire si tous les fichiers ELAN y partagent le même modèle)
+- Commande : Convertir Elan en Conll
+- Donnez la liste des tiers (sans le @SP...)
+    le premier sera celui où les ponctuations apparaissent (pas de réf)
+    il y aura ensuite une tier référence, une tier texte, une tier mot, un tier morphème, une tier glose, une tier de catégorie et une tier de traduction libre
+    Faites attention à choisir des tiers qui existent vraiment dans le fichier (voir la liste qui apparaît lorsque vous chargez le fichier)
+- Donnez les ponctuations déterminent la fin d'une phrase
+- Cliquer sur Create Connl

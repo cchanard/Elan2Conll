@@ -1,0 +1,16 @@
+Convert an Elan file to 'conll' format
+
+Sentence segmentation is based on chosen punctuations in a selected tier (can be ft, Mft or another where the punctuations exit)
+If there many speakers, the speak turns will be correctly treated if the ref tiers are cross-numbered between each other.
+You can do this cross-numbering with the command Change Label (see Label help)
+
+- Select the ELAN file (or directory if all ELAN files share the same template)
+- Command : Convert Elan to Conll
+- Give the list of the tiers (without the @SP...)
+    the first one will be the one where punctuations appears (not ref)
+    then there must be a reference tier, a text tier, a word tier, a morphem tier, a gloss tier, a pos tier and a free translation tier
+    Pay attention to choose tiers that really exist in the file (see the list that appears when you load the file)
+- Give the punctuations that should end a sentence
+- Clic on Create Connl
+
+The conll file will be created in a 'new' subdirectory under the one chosen

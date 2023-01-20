@@ -1,0 +1,7 @@
+Displays the hierarchy of an ELAN file
+
+- Select the file to be processed : File, Open File
+- Command : Show Hierarchy
+
+The hierarchy of the file appears in the console
+

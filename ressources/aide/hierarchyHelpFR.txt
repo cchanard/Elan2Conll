@@ -1,0 +1,6 @@
+Permets d'afficher la hierarchie d'un fichier ELAN
+
+- Selectionnez le fichier a traiter par File, Open
+- Faites Commande, Hierarchy
+
+La hierarchy du fichier apparait dans la console

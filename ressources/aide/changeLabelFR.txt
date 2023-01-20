@@ -1,0 +1,8 @@
+Remplace les valeurs (Label&Number) de la tier ref par le nom du fichier suivi d'un numéro d'ordre
+
+S'il y a plusieurs locuteurs, la numérotation se fera d'une tier ref à l'autre suivant l'ordre d'apparition des tours de parole
+
+- Selectionnez le fichier a traiter par File, Open
+- Faites Correction, Change Label
+- La commande Change Label est lance et change les
+  annotation_value

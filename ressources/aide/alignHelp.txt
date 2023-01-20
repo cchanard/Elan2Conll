@@ -1,0 +1,14 @@
+This command attempts to align the annotation boundaries of alignable tiers with those of a specified tier.
+
+If the boundary (start, end) of an annotation in an alignable tier
+is at an epsilon distance (<50ms) from the boundary of an annotation in the specified tier,
+the command change the timecodes to make sure they are identical.
+
+- Select the file(s) to be processed by File, Open or Open ELAN Directory
+- Command, Align
+- Enter the name of the reference tier ('mot' by default) for the alignment
+- Enter the independent tiers to be aligned with the reference tier boundaries
+  (several tiers can be mentioned, separated by commas)
+- Click on the 'Go' button
+New files will be created in a sub-folder 'new' with '_align' appended at the end of the original filenames
+
