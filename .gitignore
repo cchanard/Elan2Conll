@@ -1,5 +1,5 @@
 # Default ignored files
 /.idea
-/outils/_pycache_
-/elan/_pycache_
+/outils/_pycache_/
+/elan/_pycache_/
 /.gitlabhumanum
