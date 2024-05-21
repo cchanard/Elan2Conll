@@ -213,8 +213,8 @@ class ToolsFrame(wx.Frame):
         self.textCom2.Clear()
         self.buttonCom.SetLabelText('create Conll')
         self.buttonCom.Bind(wx.EVT_BUTTON, self.EvtSelectTiers)
-        self.textCom1.AppendText("Mft ref tx mot mb ge ps ft")
-        self.textCom2.AppendText(". ! ?")
+        self.textCom1.AppendText("tx ref tx mot mb ge rx ft")
+        self.textCom2.AppendText(". ! ? #")
         self.comPanel.Show()
         self.mainSizer.Fit(self.topPanel)
 
