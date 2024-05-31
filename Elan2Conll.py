@@ -207,13 +207,21 @@ class ToolsFrame(wx.Frame):
 
     def OnEaf2ConllU(self, event):
         global listFic
+        tierNameListe = ""
+        path = os.path.dirname(listFic[0].nom)
         #listFic=("D:\\1_Developpement\\Python\\ElanToSud\\BEJ_MV_NARR_02_FARMER.eaf")
         self.ClearHelp(event)
         self.textCom1.Clear()
         self.textCom2.Clear()
         self.buttonCom.SetLabelText('create Conll')
         self.buttonCom.Bind(wx.EVT_BUTTON, self.EvtSelectTiers)
-        self.textCom1.AppendText("tx ref tx mot mb ge rx ft")
+        try:
+            with open(path + os.sep + 'listeTiers.txt', 'r') as file:
+                for tier in file:
+                    tierNameListe += tier + " "
+        except FileNotFoundError:
+            self.textCom1.AppendText("ft ref tx mot mb ge rx ft")
+        self.textCom1.AppendText(tierNameListe)
         self.textCom2.AppendText(". ! ? #")
         self.comPanel.Show()
         self.mainSizer.Fit(self.topPanel)
@@ -396,6 +404,8 @@ class ToolsFrame(wx.Frame):
                 newFile = Fic(pathName)
                 self.readFile(dom)
                 #print(newFile.nom)
+
+
                 self.console.AppendText("\n" + newFile.nom)
 
                 if pathName.endswith((".eaf",".EAF")):

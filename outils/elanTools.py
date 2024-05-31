@@ -56,9 +56,12 @@ def Elan2ConllU(fic, tierNames, Punct, MotSeg):
     print('Elan2ConllU')
     print(tierNameListe)
     print("punct=" + Punct)
+
     # tierTypeList = (mft, ref, tx, mot, mb, ge, ps, ft)     # print(str(tList)[1:-1])
     message = ''
-    print(fic.nom)
+    print(fic.nom);
+    ficName = os.path.basename(fic.nom)
+
     ficAudio = fic.nom.split('\\')[-1][:-3] + "WAV"  # par défaut = nom du fichier
     LNG = ficAudio.split('_')[0]
     # liste des tiers existantes
@@ -67,32 +70,31 @@ def Elan2ConllU(fic, tierNames, Punct, MotSeg):
     # extrait les speakers
     SP = []
     for name in tierNameList:
-        if len(name.split('@')) > 1 and name.split('@')[1].strip() not in SP:
-            SP.append(name.split('@')[1].strip())
+        if len(name.split('@')) > 1 and "@" + name.split('@')[1].strip() not in SP:
+            SP.append("@" + name.split('@')[1].strip())
     print(SP)
+    if len(SP) == 0:        # 180524 si aucun @
+        SP.append("")
     errorList = []
     AnnTx = {}
     AnnFt = {}
-    AnnIu = {}
-    AnnTs = {}
-    AnnTg = {}
-    AnnNt = {}
-    AnnQu = {}
+    AnnXx = []
     REF = []  # liste des (id et valeur) des ref
     tierNameListSP = {}
     MFT = []
     fin = False
     haveGraid = False
     haveOthers = False
+    nOthers = 0
 
     for sp in SP:
         tnl = []
         # vérifie que toutes les tiers demandées existent avec les différents SP
         for t in tierNameListe:
-            if t.strip() + "@" + sp not in tierNameList:
-                errorList.append(t + "@" + sp)
+            if t.strip() + sp not in tierNameList:
+                errorList.append(t + sp)
             else:
-                tnl.append(t.strip() + "@" + sp)
+                tnl.append(t.strip() + sp)
         if len(errorList) > 0:
             print('le(s) tier(s) ' + str(errorList)[1:-1] + ' manque(nt) dans le fichier' + fic.nom)
             console = "!!! Le(s) tier(s) " + str(errorList)[1:-1] + " manque(nt) \ndans le fichier" + fic.nom
@@ -101,22 +103,20 @@ def Elan2ConllU(fic, tierNames, Punct, MotSeg):
 
         print(str(tierNameList)[1:-1])
         tierNameListSP[sp] = tnl
+        print(tierNameListSP)
         if len(tnl) == 8:  # 13/03/22
             mftSP, refSP, txSP, motSP, mbSP, geSP, psSP, ftSP = tnl
-        elif len(tnl) == 13:  # 28/03/2024 Natalia
-            # text_es
-            # text_iu
-            # text_notes =
-            # text_questions =
-            # research_tags =
+        elif len(tnl) > 8:  # 28/03/2024 Natalia
+            otherAnns = []
+            mftSP, refSP, txSP, motSP, mbSP, geSP, psSP, ftSP, *others  = tnl
             haveOthers = True
-            mftSP, refSP, txSP, motSP, mbSP, geSP, psSP, ftSP, teSP, iuSP, ntSP, quSP, tgSP = tnl
-            iuAnns = fic.getTier(iuSP).anns
-            tsAnns = fic.getTier(teSP).anns
-            ntAnns = fic.getTier(ntSP).anns
-            quAnns = fic.getTier(quSP).anns
-            tgAnns = fic.getTier(tgSP).anns
-        else:  # 13/03/22  si tier GRAID à la fin des tiers
+            nOthers = len(others)
+            print("nOthers="+str(nOthers))
+            for n in range(nOthers):
+                otherAnns.append(fic.getTier(others[n]).anns)
+            print ("otherAnns")
+            print(otherAnns)
+        elif len(tnl) == 9:  # 13/03/22  si tier GRAID à la fin des tiers
             haveGraid = True
             mftSP, refSP, txSP, motSP, mbSP, geSP, psSP, ftSP, GraidSP = tnl
         # affecte des index temporels symboliques aux annotations dépendantes
@@ -126,13 +126,11 @@ def Elan2ConllU(fic, tierNames, Punct, MotSeg):
         fic.preAlign(tnl)
 
         # les unités maximales provenant de la tier mft. Punct = fin d'une unité
-        mftAnns = fic.getTier(mftSP).anns  # print(len(mftAnns))
-        txAnns = fic.getTier(txSP).anns  # print(len(txAnns))
-        ftAnns = fic.getTier(ftSP).anns  # print(len(ftAnns))
+        mftAnns = fic.getTier(mftSP).anns  #;print(len(mftAnns))
+        txAnns = fic.getTier(txSP).anns    #;print(len(txAnns))
+        ftAnns = fic.getTier(ftSP).anns    #;print(len(ftAnns))
 
         if len(mftAnns) > 0 and len(txAnns) > 0:
-            txtMft = ''     # texte des Mft concaténés   # 17/08/2022 plus utilisé
-            #txtMFT = []     # 17/08/2022 plus utilisé
             Start = []      # liste de liste des start des unités Max
             End = []        # liste de liste des end des unités Max
             stop = False    # unité précédente est terminale
@@ -144,8 +142,6 @@ def Elan2ConllU(fic, tierNames, Punct, MotSeg):
                         start = mftAnn.start
                     else:  # si précédent != délimiteur
                         stop = True
-                    #txtMft = txtMft + ' ' + mftAnn.value  # concatène les textes de Mft # 17/08/2022 plus utilisé
-                    #MFT.append((txtMft.strip(), start, end))  # ces start et end ne sont plus utilisés en sortie = faux après tri
                     Start.append(start)
                     End.append(end)
                     #txtMFT.append(txtMft)
@@ -154,7 +150,6 @@ def Elan2ConllU(fic, tierNames, Punct, MotSeg):
                     if stop:
                         stop = False
                         start = mftAnn.start
-                    #txtMft = txtMft + ' ' + mftAnn.value  # print('mft'); print(len(MFT))
 
             # les ref correspondants aux Start et End des unités max
             print(Start)
@@ -183,19 +178,20 @@ def Elan2ConllU(fic, tierNames, Punct, MotSeg):
                 AnnTx[txAnn.ref] = txAnn.id
             for ftAnn in ftAnns:
                 AnnFt[ftAnn.ref] = ftAnn.id
+            print("AnnFt")
+            print(AnnFt)
             if haveOthers:
-                for iuAnn in iuAnns:
-                    AnnIu[iuAnn.ref] = iuAnn.id
-                for tsAnn in tsAnns:
-                    AnnTs[tsAnn.ref] = tsAnn.id
-                for tgAnn in tgAnns:
-                    AnnTg[tgAnn.ref] = tgAnn.id
-                for ntAnn in ntAnns:
-                    AnnNt[ntAnn.ref] = ntAnn.id
-                for quAnn in quAnns:
-                    AnnQu[quAnn.ref] = quAnn.id
-        #print('REF');
-        #print(REF)
+                for n in range(nOthers):
+                    annX = {}
+                    for xAnn in otherAnns[n]:
+                        annX[xAnn.ref] = xAnn.id
+                    if len(AnnXx) == nOthers :
+                        for anx in annX:
+                            AnnXx[n][anx] = annX[anx]
+                    else:
+                        AnnXx.append(annX)
+                print("AnnXx")
+                print (AnnXx)
     # fin des SP
     if fin == True:
         return (console)
@@ -216,68 +212,49 @@ def Elan2ConllU(fic, tierNames, Punct, MotSeg):
     # les tx correspondants aux ref
     TXtx = []   # liste de liste des tx concaténés des unités Max
     FTtx = []   # liste de liste des ft concaténés des unités Max
-    IUtx =  []
-    TStx = []
-    TGtx = []
-    NTtx = []
-    QUtx = []
+    XXtx = []
     TXannIds = []  # liste de liste des annId des tx des unités Max
 
     for Ref in REF:     # pour chaque unité max
         txt = ''
         ft = ''
-        iu = ''
-        ts = ''
-        tg = ''
-        nt = ''
-        qu = ''
+        xx = []
+        for n in range(nOthers):
+            xx.append("")
         TxannId = []  # liste des tx d'une unité Max
 
         for refIdValue in Ref:  # ensemble des ref d'une unité max : { refAnn.id, refAnn.value, sp, Start[i], End[i] }
             refId = refIdValue[0]
             if refId in AnnTx:
                 annTx = fic.getAnn(AnnTx[refId])  # annotation du tx correspondant au ref
-                if annTx is not None:
+                if annTx is not None and annTx.value > "":
                     txt = txt + ' ' + annTx.value
                     TxannId.append(AnnTx[refId])
                 if refId in AnnFt:
                     annFt = fic.getAnn(AnnFt[refId])  # annotation du ft correspondant au ref
-                    if annFt is not None:
+                    if annFt is not None and annFt.value > "":
                         ft = ft + ' ' + annFt.value
-                if refId in AnnIu:
-                    annIu = fic.getAnn(AnnIu[refId])  # annotation du iu correspondant au ref
-                    if annIu is not None:
-                        iu = iu + ' ' + annIu.value
-                if refId in AnnTs:
-                    annTs = fic.getAnn(AnnTs[refId])
-                    if annTs is not None:
-                        ts = ts + ' ' + annTs.value
-                if refId in AnnTg:
-                    annTg = fic.getAnn(AnnTg[refId])
-                    if annTg is not None:
-                        tg = tg + ' ' + annTg.value
-                if refId in AnnNt:
-                    annNt = fic.getAnn(AnnNt[refId])
-                    if annNt is not None:
-                        nt = nt + ' ' + annNt.value
-                if refId in AnnQu:
-                    annQu = fic.getAnn(AnnQu[refId])
-                    if annQu is not None:
-                        qu = qu + ' ' + annQu.value
+                        print(ft)
+                if haveOthers:
+                    for n in range(nOthers):
+                        print(refId)
+                        if refId in AnnXx[n]:
+                            print(AnnXx[n][refId])
+                            annXx = fic.getAnn(AnnXx[n][refId])
+                            if annXx is not None and annXx.value > "":
+                                xx[n] = xx[n] + ' ' + annXx.value
+                    print("xx:")
+                    print(xx);
         TXtx.append(re.sub(' {2,}', ' ', txt))
         TXannIds.append(TxannId)
-
         FTtx.append(re.sub(' {2,}', ' ', ft))
-        IUtx.append(re.sub(' {2,}', ' ', iu))
-        TStx.append(re.sub(' {2,}', ' ', ts))
-        TGtx.append(re.sub(' {2,}', ' ', tg))
-        NTtx.append(re.sub(' {2,}', ' ', nt))
-        QUtx.append(re.sub(' {2,}', ' ', qu))
-        # print('TXtx'); print(re.sub(' {2,}', ' ',txt))
+        if haveOthers:
+            XXtx.append(xx)
+            print("XXtx")
+            print(XXtx);
 
     # les ft correspondants aux ref
     print('free translation')
-    #FT = autresTiers(fic, "ft", REF, tierNameListSP)
 
     ftAnns = []
     for sp, tierNamelist in tierNameListSP.items():
@@ -306,16 +283,18 @@ def Elan2ConllU(fic, tierNames, Punct, MotSeg):
     annsMorphGe = {}
     annsMorphPs = {}
     annsMorphGraid = {}
+    print("SP")
     for sp in SP:
+        others = []
         if len(tierNameListSP[sp]) == 8:
             mftSP, refSP, txSP, motSP, mbSP, geSP, psSP, ftSP = tierNameListSP[sp]
-        elif len(tierNameListSP[sp]) == 13:  # 28/03/2024 Natalia
-            print ("Other")
-            mftSP, refSP, txSP, motSP, mbSP, geSP, psSP, ftSP, iuSP, teSP, ntSP, quSPb, tgSP = tierNameListSP[sp]
+        elif len(tierNameListSP[sp]) > 8:  # 28/03/2024 Natalia
+            mftSP, refSP, txSP, motSP, mbSP, geSP, psSP, ftSP, *others = tierNameListSP[sp]
+            print ("Others:" + str(len(others)))
         else:  # tier Graid à la fin => Sonja
+            print ("Graid")
             haveGraid = True
             mftSP, refSP, txSP, motSP, mbSP, geSP, psSP, ftSP, GraidSP = tierNameListSP[sp]
-
         anns = fic.getAnnsChildren(txSP, motSP)
         if len(anns) > 0:
             if annsTxMot is None:
@@ -439,7 +418,8 @@ def Elan2ConllU(fic, tierNames, Punct, MotSeg):
                     pss.append(ann.value)
                 else:
                     if len(annsMorphPs[idMorph]) > 0:
-                        pss.append(annsMorphPs[idMorph][0].value.strip(' .-='))
+                        mrph = annsMorphPs[idMorph][0].value.strip(' .-=').replace(" ","_")
+                        pss.append(mrph)
                     else:  # pas de ps
                         pss.append('')
             else:
@@ -462,7 +442,7 @@ def Elan2ConllU(fic, tierNames, Punct, MotSeg):
                 graids.append('')
         GRAID.append(graids)  # print('pos'); print(PS[1]); print(TXMorph); exit()
 
-    """print("MORPH")
+    print("MORPH")
     print(MORPH)
     print("GLOSE")
     print(GLOSE)
@@ -472,7 +452,7 @@ def Elan2ConllU(fic, tierNames, Punct, MotSeg):
     print("GRAID")
     print(GRAID)
     # print(LEMME)
-    """
+
 
     # Enregistre conll
     out = ''
@@ -485,7 +465,8 @@ def Elan2ConllU(fic, tierNames, Punct, MotSeg):
         end = REF[t][len(REF[t]) - 1][4]  # end de la dernière phrase du groupe
 
         out = out + "# sent_id = " + refNum + "\n"
-        out = out + "# speaker_id = " + sp + "\n"
+        if sp!= "":
+            out = out + "# speaker_id = " + sp + "\n"
         out = out + "# sound_url = https://corporan.huma-num.fr/Archives/media/" + LNG + "/WAV/" + ficAudio + '\n'
         out = out + "# sent_timecode = " + start + ", " + end + '\n'
         # out = out + "# text = " + TXtx[t] + "\n"               # liste des ann.value de la tier mot
@@ -494,12 +475,10 @@ def Elan2ConllU(fic, tierNames, Punct, MotSeg):
         #out = out + "# text_en = " + FT[t] + "\n"
         out = out + "# text_en = " + FTtx[t] + "\n"  # 17/08/2022 pour traiter cas où Mft = tx
         if haveOthers:
-            out = out + "# text_es = " + TStx[t] + "\n"
-            out = out + "# text_iu = " + IUtx[t] + "\n"
-            out = out + "# text_tg = " + TGtx[t] + "\n"
-            out = out + "# text_nt = " + NTtx[t] + "\n"
-            out = out + "# text_qu = " + QUtx[t] + "\n"
-            #out = out + "# text_en = " + txtMft.strip('§') + "\n"  # 17/08/2022 plus utilisé
+            for n in range(nOthers):
+                tiername = others[n].split("@")[0]
+                if len(XXtx[t][n]) > 0:
+                    out = out + "# text_" + tiername + " = " + XXtx[t][n] + "\n"
         for m in range(len(MORPH[t])):
             if MotSeg:  # 16/02/22 => Natalia
                 MSeg = "|MSeg=" + MORPH[t][m][0]  #.replace(' ', '')
@@ -508,7 +487,7 @@ def Elan2ConllU(fic, tierNames, Punct, MotSeg):
             lemme = LEMME[t][m]
             if GLOSE[t][m] != '':  # valeur du lemme
                 # Mglose = "|MGloss=" + GLOSE[t][m].strip()
-                gloss = "|Gloss=" + GLOSE[t][m].strip()
+                gloss = "|Gloss=" + GLOSE[t][m].strip().replace(" ","_")
             else:
                 # Mglose = ''
                 gloss = ""
@@ -553,15 +532,17 @@ def Elan2ConllU(fic, tierNames, Punct, MotSeg):
                 token = MORPH[t][m][0]  # morpheme
             """out = out + str(m + 1) + "\t" + token + "\t" + lemme + "\t" + PS[t][m].upper() + "\t_\tMGloss=" + GE[t][
                 m].replace("|", "$") + "\t_\t_\t_\t" + misc + '\n'"""
-            out = out + str(m + 1) + "\t" + token + "\t" + lemme + "\t" + PS[t][m].upper() + "\t_\tGloss=" + GE[t][
-                m] + "\t_\t_\t_\t" + misc + '\n'
-
+            out = out + str(m + 1) + "\t" + token + "\t" + lemme + "\t" + PS[t][m].upper() + "\t_"
+            if GE[t][m] > "":
+                out += "\tGloss=" + GE[t][m]
+            else:
+                out += "\t"
+            out += "\t_\t_\t_\t" + misc + '\n'
         out = out + '\n'
     print(out)
-    ficName = os.path.basename(fic.nom)
     dirNew = CW.CreateDirNew(os.path.dirname(fic.nom))
     ficOut = dirNew + os.sep + ficName[0:-4] + ".conll"
-    f = open(ficOut, "w", encoding='utf8')
+    f = open(ficOut, "w", encoding='utf8', newline='\n')
     f.write(out)
     f.close()
     message = message + "Fichier " + ficName[0:-4] + ".conll \nengistré dans le dossier " + dirNew
