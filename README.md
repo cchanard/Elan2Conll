@@ -76,6 +76,9 @@ Si l'on veut un fichier Conll dans lequel les tokens sont des mots ou des concat
 
 ## Conversion Flex to ElanCorpA
 - **Locuteurs** : il faut remplacer tous les préfixes **X_** (ex: A_, B_) par **@SPn** (avec n un chiffre). On peut le faire par chercher-remplacer avec une expression régulière.
+  - rechercher : **"A_([^"]+)"**
+  - remplacer par : **"\1@SP1"**
+  - de même pour **B_** par **@SP2**
 - Il faut que la **hiérarchie des tiers** du fichier Flex soit conforme à celle des fichiers ElanCorpA (voir [documentation ELAN-CorpA](https://llacan.cnrs.fr/res_ELAN-CorpA.php))
 
 ## Conversion Toolbox to Elan
@@ -83,7 +86,7 @@ Si l'on veut un fichier Conll dans lequel les tokens sont des mots ou des concat
 - Si on veut ajouter une ligne `mot` (sur le modèle d'Elan-corpA), on duplique la ligne `\tx` (ou \t) dans Toolbox (expression régulière) et on l'appelle `\mot`.
 - `Fichier > Importer > Toolbox > choisir le fichier > Set Field Markers (définition à la main des champs)`
   - t : association > change
-  - mot : parent = t, subdivition > add
+  - mot : parent = t, subdivision > add
   - m : parent = mot, subdivision > change
   - vérifier les autres 
 - Store markers (fichier .mkr) > close
