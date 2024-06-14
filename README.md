@@ -8,8 +8,7 @@
   * [Conversion d'Elan à ConllU](#conversion-d-elan---conllu)
   * [Transformation d'un fichier Elan annoté par morphème en un fichier Elan annoté au niveau du mot (cf fichier Gbaya de Paulette)](#transformation-d-un-fichier-elan-annot--par-morph-me-en-un-fichier-elan-annot--au-niveau-du-mot--cf-fichier-gbaya-de-paulette-)
   * [Conversion Toolbox to Elan](#conversion-toolbox-to-elan)
-    + [Associer un fichier son au fichier d'annotations Elan](#associer-un-fichier-son-au-fichier-d-annotations-elan)
-
+    
 # ELAN2Conll
 ## Installation
 Le logiciel fonctionne sous windows et linux à condtion de pouvoir installer WxPython sur votre distribution Linux.
