@@ -343,6 +343,8 @@ def Elan2ConllU(fic, tierNames, Punct, MotSeg):
                     txMot = txMot + ' ' + valMot
                     annMot.append((motsId[m].id, str(nMot), valMot))  # valMot 16/02/22))
         MOTanns.append(annMot)
+        if txMot == "":
+            txMot = "Inaudible"     # 080724
         TXmots.append(txMot.strip())
         # print('TXmots'); print(len(TXmots))
 
@@ -378,6 +380,8 @@ def Elan2ConllU(fic, tierNames, Punct, MotSeg):
                     morphs.append((valMorph, tc1, tc2, nMot, valMot))  # valMot 16/02/22
                     morphAnns.append(morphsId[m].id.replace(" ", ""))  # liste des morphID de la phrase max
         MORPH.append(morphs)  # print('morph'); print(len(MORPH))
+        if morphTxt=="":
+            morphTxt = "Inaudible"  #080724
         TXMorph.append(morphTxt)
         LEMME.append(lemme)
         # les gloses des morphèmes
@@ -479,65 +483,68 @@ def Elan2ConllU(fic, tierNames, Punct, MotSeg):
                 tiername = others[n].split("@")[0]
                 if len(XXtx[t][n]) > 0:
                     out = out + "# text_" + tiername + " = " + XXtx[t][n] + "\n"
-        for m in range(len(MORPH[t])):
-            if MotSeg:  # 16/02/22 => Natalia
-                MSeg = "|MSeg=" + MORPH[t][m][0]  #.replace(' ', '')
-            else:
-                MSeg = ''
-            lemme = LEMME[t][m]
-            if GLOSE[t][m] != '':  # valeur du lemme
-                # Mglose = "|MGloss=" + GLOSE[t][m].strip()
-                gloss = "|Gloss=" + GLOSE[t][m].strip().replace(" ","_")
-            else:
-                # Mglose = ''
-                gloss = ""
-            misc = "AlignBegin=" + MORPH[t][m][1] + "|AlignEnd=" + MORPH[t][m][2] + "|nWord=" + MORPH[t][m][3]
-            # misc = misc + gloss        # on utilise plutôt Etiq_Glose(GE)
-            misc = misc + MSeg
-            glose, etiq, TypeToken, Position = Etiq_Glose(GE[t][m])
-            pos = PS[t][m].replace('.', '].[')
-            # pos = pos.replace('-', '].[')
-            # pos = '[' + pos.replace('=', '].[') + ']'.replace("|","$")
-            pos = '[' + pos.replace("|", "$") + ']'
-            if haveGraid:
-                graid = GRAID[t][m]
-            # misc = misc + Mglose
-            if glose.islower():     # mot
-                misc = misc + "|GE=" + glose.replace("|", "$")
-                gloss = "|Gloss=" + glose
-            elif glose != '':       # étiquette
-                misc = misc + "|GE=" + '[' + glose.replace('.', '].[').replace("|", "$") + ']'
-                # misc = misc + "|MGloss=" + glose.replace("|", "$") + ']'
-                # glose = "Gloss=" + glose
-            # TokenType
-            if TypeToken:
-                misc = misc + "|TypeToken=" + TypeToken
-            if Position:
-                misc = misc + "|Position=" + Position
-            if etiq != '':  # and etiq.isupper():                   # étiquette gramm. dans glose
-                # misc = misc + "|GE=" + etiq #+ '[' + etiq.replace('.', '].[') + ']'
-                misc = misc + '|RX=' + pos.upper()
-            elif (PS[t][m] != '' and PS[t][m] not in Symb):  # pas d'étiquette gram. dans glose'
-                misc = misc + '|RX=' + pos.upper()
-                if (haveGraid and graid != '' and graid not in Symb):  # pas d'étiquette gram. dans glose'
-                    graid = '[' + graid.replace(':', ']:[') + ']'
-                    misc = misc + '|GRAID=' + graid
+        if (len(MORPH[t])) == 0:
+            out = out + "1\tinaudible\t\t\t\t\t\t\t\t_\n"
+        else :
+            for m in range(len(MORPH[t])):
+                if MotSeg:  # 16/02/22 => Natalia
+                    MSeg = "|MSeg=" + MORPH[t][m][0]  #.replace(' ', '')
+                else:
+                    MSeg = ''
+                lemme = LEMME[t][m]
+                if GLOSE[t][m] != '':  # valeur du lemme
+                    # Mglose = "|MGloss=" + GLOSE[t][m].strip()
+                    gloss = "|Gloss=" + GLOSE[t][m].strip().replace(" ","_")
+                else:
+                    # Mglose = ''
+                    gloss = ""
+                misc = "AlignBegin=" + MORPH[t][m][1] + "|AlignEnd=" + MORPH[t][m][2] + "|nWord=" + MORPH[t][m][3]
+                # misc = misc + gloss        # on utilise plutôt Etiq_Glose(GE)
+                misc = misc + MSeg
+                glose, etiq, TypeToken, Position = Etiq_Glose(GE[t][m])
+                pos = PS[t][m].replace('.', '].[')
+                # pos = pos.replace('-', '].[')
+                # pos = '[' + pos.replace('=', '].[') + ']'.replace("|","$")
+                pos = '[' + pos.replace("|", "$") + ']'
+                if haveGraid:
+                    graid = GRAID[t][m]
+                # misc = misc + Mglose
+                if glose.islower():     # mot
+                    misc = misc + "|GE=" + glose.replace("|", "$")
+                    gloss = "|Gloss=" + glose
+                elif glose != '':       # étiquette
+                    misc = misc + "|GE=" + '[' + glose.replace('.', '].[').replace("|", "$") + ']'
+                    # misc = misc + "|MGloss=" + glose.replace("|", "$") + ']'
+                    # glose = "Gloss=" + glose
+                # TokenType
+                if TypeToken:
+                    misc = misc + "|TypeToken=" + TypeToken
+                if Position:
+                    misc = misc + "|Position=" + Position
+                if etiq != '':  # and etiq.isupper():                   # étiquette gramm. dans glose
+                    # misc = misc + "|GE=" + etiq #+ '[' + etiq.replace('.', '].[') + ']'
+                    misc = misc + '|RX=' + pos.upper()
+                elif (PS[t][m] != '' and PS[t][m] not in Symb):  # pas d'étiquette gram. dans glose'
+                    misc = misc + '|RX=' + pos.upper()
+                    if (haveGraid and graid != '' and graid not in Symb):  # pas d'étiquette gram. dans glose'
+                        graid = '[' + graid.replace(':', ']:[') + ']'
+                        misc = misc + '|GRAID=' + graid
 
-            misc = misc.replace('[-', '-[').replace('[=', '=[').replace('-]', ']-').replace('=]', ']=')
-            # out = out + str(m+1) + "\t" + MORPH[t][m][0] + "\t_\t_\t" + PS[t][m] + "\t" + glose + etiq + "\t_\t_\t_\t" + misc + '\n'
-            # out = out + str(m+1) + "\t" + MORPH[t][m][0] + "\t_\t" + PS[t][m].upper() + "\t_\tGloss=" + GE[t][m].replace("|","$") + "\t_\t_\t_\t" + misc + '\n'
-            if MotSeg:
-                token = MORPH[t][m][4]  # mot correspondant aux morphèmes concaténés
-            else:
-                token = MORPH[t][m][0]  # morpheme
-            """out = out + str(m + 1) + "\t" + token + "\t" + lemme + "\t" + PS[t][m].upper() + "\t_\tMGloss=" + GE[t][
-                m].replace("|", "$") + "\t_\t_\t_\t" + misc + '\n'"""
-            out = out + str(m + 1) + "\t" + token + "\t" + lemme + "\t" + PS[t][m].upper() + "\t_"
-            if GE[t][m] > "":
-                out += "\tGloss=" + GE[t][m]
-            else:
-                out += "\t"
-            out += "\t_\t_\t_\t" + misc + '\n'
+                misc = misc.replace('[-', '-[').replace('[=', '=[').replace('-]', ']-').replace('=]', ']=')
+                # out = out + str(m+1) + "\t" + MORPH[t][m][0] + "\t_\t_\t" + PS[t][m] + "\t" + glose + etiq + "\t_\t_\t_\t" + misc + '\n'
+                # out = out + str(m+1) + "\t" + MORPH[t][m][0] + "\t_\t" + PS[t][m].upper() + "\t_\tGloss=" + GE[t][m].replace("|","$") + "\t_\t_\t_\t" + misc + '\n'
+                if MotSeg:
+                    token = MORPH[t][m][4]  # mot correspondant aux morphèmes concaténés
+                else:
+                    token = MORPH[t][m][0]  # morpheme
+                """out = out + str(m + 1) + "\t" + token + "\t" + lemme + "\t" + PS[t][m].upper() + "\t_\tMGloss=" + GE[t][
+                    m].replace("|", "$") + "\t_\t_\t_\t" + misc + '\n'"""
+                out = out + str(m + 1) + "\t" + token + "\t" + lemme + "\t" + PS[t][m].upper() + "\t_"
+                if GE[t][m] > "":
+                    out += "\tGloss=" + GE[t][m]
+                else:
+                    out += "\t"
+                out += "\t_\t_\t_\t" + misc + '\n'
         out = out + '\n'
     print(out)
     dirNew = CW.CreateDirNew(os.path.dirname(fic.nom))
