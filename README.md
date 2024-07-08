@@ -40,8 +40,35 @@ pip install -U \
     -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-16.04 \
     wxPython
 ```
+## Conversion Flex to ElanCorpA
+- **Locuteurs** : il faut remplacer tous les préfixes **X_** (ex: A_, B_) par **@SPn** (avec n un chiffre). On peut le faire par chercher-remplacer avec une expression régulière.
+  - rechercher : **"A_([^"]+)"**
+  - remplacer par : **"\1@SP1"**
+  - de même pour **B_** par **@SP2**
+- Il faut que la **hiérarchie des tiers** du fichier Flex soit conforme à celle des fichiers ElanCorpA (voir [documentation ELAN-CorpA](https://llacan.cnrs.fr/res_ELAN-CorpA.php))
 
-### Lancement de l'interface graphique
+## Conversion Toolbox to Elan
+- En général, la ligne de texte (`\tx` ou `\t`) toolbox correspond à la ligne mot dans Elan. Pas vraiment de ligne phrase et de ligne mot.
+- Si on veut ajouter une ligne `mot` (sur le modèle d'Elan-corpA), on duplique la ligne `\tx` (ou \t) dans Toolbox (expression régulière) et on l'appelle `\mot`.
+- `Fichier > Importer > Toolbox > choisir le fichier > Set Field Markers (définition à la main des champs)`
+  - t : association > change
+  - mot : parent = t, subdivision > add
+  - m : parent = mot, subdivision > change
+  - vérifier les autres 
+- Store markers (fichier .mkr) > close
+- Cocher : *all markers are unicode*
+- Une fois le fichier importé dans Elan, pour avoir la représentation hiérarchique et non plate des tiers : `clic droit sur la partie gauche(avec la liste de tiers) > Sort tiers (trier par acteur) > Sort by hierarchy`
+- Si dans la tier `\tx`, les mots sont séparés par plusieurs espaces, il faut normaliser : `Rechercher > 2 espaces ou plus dans \t à remplacer par un seul espace`.
+- Nettoyer les mots éventuellement en supprimant les guillemets, points... avec "Rechercher"
+
+## Préparation d'un fichier ELAN
+- Il faut s'assurer que tous les mots ont des enfants morphèmes, gloses et catégories. Si ce n'est pas le cas, faire:
+  - Tier, Copy Annotation on Dependant Tiers
+  - Sélectionner la (ou les) tier(s) mot, Next
+  - Sélectionner les enfants, Finish
+  des annotations vides auront été créées sous les annotations 'mot' qui n'en avaient pas
+
+## Lancement de l'interface graphique
 ```
 python Elan2Conll.py
 ```
@@ -58,6 +85,7 @@ python Elan2Conll.py
       - Un checkbox permet de préciser si le token doit être le **mot ou le morphème** (par défaut)
 - Si tout se déroule bien, le ou les fichiers ConllU sont créés dans un répertoire `new` au même niveau que le fichier ou le répertoire de fichiers ELAN.
 
+
 ## Transformation d'un fichier Elan annoté par morphème en un fichier Elan annoté au niveau du mot (cf fichier Gbaya de Paulette)
 À partir d'un fichier Toolbox d'origine, lorsque l'on fait la transformation en Conll, on obtient un découpage en morphème (token = morph).
 
@@ -72,13 +100,6 @@ Si l'on veut un fichier Conll dans lequel les tokens sont des mots ou des concat
 - Quand on **NE COCHE PAS** l'option `Token=mot`, on obtient des tokens qui sont la concaténation des morphèmes.
 
 **ToDo** : vérifier quel fichier est plus utile dans Arborator.
-
-## Conversion Flex to ElanCorpA
-- **Locuteurs** : il faut remplacer tous les préfixes **X_** (ex: A_, B_) par **@SPn** (avec n un chiffre). On peut le faire par chercher-remplacer avec une expression régulière.
-  - rechercher : **"A_([^"]+)"**
-  - remplacer par : **"\1@SP1"**
-  - de même pour **B_** par **@SP2**
-- Il faut que la **hiérarchie des tiers** du fichier Flex soit conforme à celle des fichiers ElanCorpA (voir [documentation ELAN-CorpA](https://llacan.cnrs.fr/res_ELAN-CorpA.php))
 
 ## Conversion Toolbox to Elan
 - En général, la ligne de texte (`\tx` ou `\t`) toolbox correspond à la ligne mot dans Elan. Pas vraiment de ligne phrase et de ligne mot.
