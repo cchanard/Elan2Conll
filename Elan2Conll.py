@@ -208,20 +208,36 @@ class ToolsFrame(wx.Frame):
     def OnEaf2ConllU(self, event):
         global listFic
         tierNameListe = ""
+        tiers = ['Mft','ref','tx','mot','mb','ge','ps','ft']
         path = os.path.dirname(listFic[0].nom)
+        fileCorr = path + "/fieldCorr.txt"
+        if os.path.exists(fileCorr):
+            corr = {}
+            with open(fileCorr, 'r') as file:
+                for line in file:
+                    field = line.split(' ')
+                    corr[field[1]] = field[0]
+            if all(key in corr for key in tiers):
+                listTiers = ''
+                for key in tiers:
+                    listTiers += corr[key] + ' '
+            else:
+                print("la liste des tiers n'est pas complete")
+                listTiers = ' '.join(tiers)
+            extraKeys = [key for key in corr if key not in tiers]
+            for key in extraKeys:
+                listTiers += corr[key] + ' '
+            listTiers = listTiers.strip()
+        else:
+            listTiers = ' '.join(tiers)
+            print("pas de fichier de configuration fieldCorr")
         #listFic=("D:\\1_Developpement\\Python\\ElanToSud\\BEJ_MV_NARR_02_FARMER.eaf")
         self.ClearHelp(event)
         self.textCom1.Clear()
         self.textCom2.Clear()
         self.buttonCom.SetLabelText('create Conll')
         self.buttonCom.Bind(wx.EVT_BUTTON, self.EvtSelectTiers)
-        try:
-            with open(path + os.sep + 'listeTiers.txt', 'r') as file:
-                for tier in file:
-                    tierNameListe += tier + " "
-        except FileNotFoundError:
-            self.textCom1.AppendText("ft ref tx mot mb ge rx ft")
-        self.textCom1.AppendText(tierNameListe)
+        self.textCom1.AppendText(listTiers)
         self.textCom2.AppendText(". ! ? #")
         self.comPanel.Show()
         self.mainSizer.Fit(self.topPanel)

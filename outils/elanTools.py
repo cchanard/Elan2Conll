@@ -545,7 +545,7 @@ def Elan2ConllU(fic, tierNames, Punct, MotSeg):
     f = open(ficOut, "w", encoding='utf8', newline='\n')
     f.write(out)
     f.close()
-    message = message + "Fichier " + ficName[0:-4] + ".conll \nengistré dans le dossier " + dirNew
+    message = message + "Fichier " + ficName[0:-4] + ".conll \nenregistré dans le dossier " + dirNew
     print(message)
     return (message)
 
